@@ -108,8 +108,8 @@ nav {
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
 }
-.hero-logo img { width: 100%; height: 100%; object-fit: cover; display: none; }
-.hero-logo svg { width: 40px; height: 40px; }
+.hero-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-logo svg { width: 40px; height: 40px; display: none; }
 .hero-status {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 5px 14px 5px 10px;
@@ -501,8 +501,9 @@ footer small { font-size: 12px; color: var(--text-3); }
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo" aria-label="NexaBot home">
-    <div class="nav-logo-img">
-      <svg viewBox="0 0 16 16" fill="none" stroke="#C8922A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2L2 5v4c0 3 2.5 5 6 5s6-2 6-5V5L8 2z"/><path d="M6 8l1.5 1.5L10 6"/></svg>
+    <div class="nav-logo-img" style="padding:0;overflow:hidden;">
+      <img src="nexa-logo.png" alt="NexaBot" style="width:100%;height:100%;object-fit:cover;border-radius:7px;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <svg style="display:none" viewBox="0 0 16 16" fill="none" stroke="#C8922A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2L2 5v4c0 3 2.5 5 6 5s6-2 6-5V5L8 2z"/><path d="M6 8l1.5 1.5L10 6"/></svg>
     </div>
     <span class="nav-wordmark">Nexa<em>Bot</em></span>
   </a>
@@ -522,8 +523,8 @@ footer small { font-size: 12px; color: var(--text-3); }
   <div class="hero-ambient"></div>
   <div class="hero-content">
     <div class="hero-logo">
-      <img src="nexa-logo.png" alt="NexaBot" onerror="this.style.display='none'">
-      <svg viewBox="0 0 40 40" fill="none" stroke="#C8922A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4L4 12v10c0 8 6 14 16 14s16-6 16-14V12L20 4z"/><path d="M15 20l4 4 7-7"/></svg>
+      <img src="nexa-logo.png" alt="NexaBot" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <svg style="display:none" viewBox="0 0 40 40" fill="none" stroke="#C8922A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4L4 12v10c0 8 6 14 16 14s16-6 16-14V12L20 4z"/><path d="M15 20l4 4 7-7"/></svg>
     </div>
     <div class="hero-status mono">
       <span class="status-pip"></span>
