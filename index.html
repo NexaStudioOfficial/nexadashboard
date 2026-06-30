@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaBot — Discord Automation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #080808;
+  --bg-2:         #0f0f0f;
+  --bg-3:         #161616;
+  --bg-4:         #1e1e1e;
+  --bg-5:         #252525;
+  --border:       rgba(255,255,255,0.055);
+  --border-md:    rgba(255,255,255,0.09);
+  --border-hi:    rgba(255,255,255,0.15);
+  --accent:       #C8922A;
+  --accent-hi:    #E3A83C;
+  --accent-dim:   rgba(200,146,42,0.12);
+  --accent-glow:  rgba(200,146,42,0.22);
+  --text:         #F0F0F0;
+  --text-2:       #7A7A7A;
+  --text-3:       #3D3D3D;
+  --green:        #3DBA6F;
+  --green-dim:    rgba(61,186,111,0.12);
+  --red:          #E05454;
+  --red-dim:      rgba(224,84,84,0.12);
+  --blue:         #5B8FF4;
+  --blue-dim:     rgba(91,143,244,0.12);
+  --radius:       10px;
+  --radius-lg:    16px;
+  --radius-xl:    22px;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-5); border-radius: 4px; }
+
+/* ── UTILITY ── */
+.mono { font-family: 'JetBrains Mono', monospace; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 60px;
+  background: rgba(8,8,8,0.88); backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; background: var(--bg-4); border: 1px solid var(--border-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-logo-img svg { width: 16px; height: 16px; }
+.nav-wordmark { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+.nav-wordmark em { font-style: normal; color: var(--accent-hi); }
+.nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+.nav-links a { color: var(--text-2); text-decoration: none; font-size: 13.5px; font-weight: 500; transition: color 0.18s; letter-spacing: -0.1px; }
+.nav-links a:hover { color: var(--text); }
+.nav-cta { display: flex; align-items: center; gap: 10px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 18px; border-radius: var(--radius);
+  font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s; border: none; text-decoration: none;
+  white-space: nowrap; letter-spacing: -0.1px;
+}
+.btn-ghost {
+  background: transparent; color: var(--text-2);
+  border: 1px solid var(--border-md);
+}
+.btn-ghost:hover { background: var(--bg-3); color: var(--text); border-color: var(--border-hi); }
+.btn-primary { background: var(--text); color: #0a0a0a; }
+.btn-primary:hover { background: #fff; box-shadow: 0 0 24px rgba(200,146,42,0.2); transform: translateY(-1px); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { background: var(--accent-hi); transform: translateY(-1px); }
+.btn-lg { padding: 12px 28px; font-size: 14.5px; border-radius: 12px; }
+.btn-sm { padding: 6px 14px; font-size: 12.5px; border-radius: 8px; }
+.btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(224,84,84,0.2); }
+.btn-danger:hover { background: rgba(224,84,84,0.2); }
+
+/* ── HERO ── */
+.hero {
+  position: relative; min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 120px 24px 80px; overflow: hidden;
+}
+.hero-ambient {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(200,146,42,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(91,143,244,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(61,186,111,0.03) 0%, transparent 55%);
+}
+.hero-content { position: relative; z-index: 1; max-width: 760px; }
+.hero-logo {
+  width: 80px; height: 80px; border-radius: 20px; margin: 0 auto 32px;
+  background: var(--bg-3); border: 1px solid var(--border-md);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.hero-logo img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.hero-logo svg { width: 40px; height: 40px; }
+.hero-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 14px 5px 10px;
+  background: var(--bg-2); border: 1px solid var(--border-md);
+  border-radius: 100px; font-size: 12px; font-weight: 500; color: var(--text-2);
+  margin-bottom: 32px; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.2px;
+}
+.status-pip { width: 7px; height: 7px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); animation: pip 2.4s ease-in-out infinite; flex-shrink: 0; }
+@keyframes pip { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+.hero h1 {
+  font-size: clamp(38px, 5.5vw, 70px); font-weight: 800;
+  line-height: 1.05; letter-spacing: -2.5px; margin-bottom: 22px; color: #fff;
+}
+.hero h1 .hi { color: transparent; background: linear-gradient(95deg, var(--accent-hi) 0%, #F5C96A 100%); -webkit-background-clip: text; background-clip: text; }
+.hero-sub { font-size: 17px; color: var(--text-2); max-width: 480px; margin: 0 auto 40px; line-height: 1.7; font-weight: 400; }
+.hero-actions { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.hero-rule { width: 1px; height: 20px; background: var(--border-md); margin: 0 2px; }
+.hero-floor {
+  display: flex; align-items: center; justify-content: center; gap: 56px;
+  margin-top: 72px; padding-top: 48px; border-top: 1px solid var(--border);
+}
+.floor-stat .num { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -1px; font-family: 'JetBrains Mono', monospace; }
+.floor-stat .lbl { font-size: 12px; color: var(--text-3); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+
+/* ── FEATURES ── */
+.section { position: relative; max-width: 1160px; margin: 0 auto; padding: 80px 40px; }
+.eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+.section-h { font-size: clamp(26px, 3vw, 40px); font-weight: 800; letter-spacing: -1.2px; line-height: 1.1; margin-bottom: 14px; color: #fff; }
+.section-sub { color: var(--text-2); font-size: 15px; max-width: 420px; line-height: 1.65; }
+.section-hd { margin-bottom: 52px; }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.fcard {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 26px; transition: border-color 0.25s, transform 0.25s; position: relative; overflow: hidden;
+}
+.fcard::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-dim), transparent); opacity: 0; transition: opacity 0.3s; }
+.fcard:hover { border-color: rgba(200,146,42,0.2); transform: translateY(-2px); }
+.fcard:hover::before { opacity: 1; }
+.fcard-icon {
+  width: 40px; height: 40px; background: var(--bg-4); border: 1px solid var(--border-md);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px; flex-shrink: 0;
+}
+.fcard-icon svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.fcard h3 { font-size: 15px; font-weight: 700; margin-bottom: 9px; color: #fff; letter-spacing: -0.2px; }
+.fcard p { font-size: 13.5px; color: var(--text-2); line-height: 1.65; }
+.fcard-tag { display: inline-block; margin-top: 16px; padding: 3px 9px; border: 1px solid var(--border); border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); }
+
+/* ── CTA STRIP ── */
+.cta-strip { max-width: 1160px; margin: 0 auto 80px; padding: 0 40px; }
+.cta-inner {
+  background: var(--bg-2); border: 1px solid var(--border-md); border-radius: var(--radius-xl);
+  padding: 64px; text-align: center; position: relative; overflow: hidden;
+}
+.cta-inner::after { content: ''; position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); width: 400px; height: 120px; background: radial-gradient(ellipse, rgba(200,146,42,0.1), transparent 70%); filter: blur(8px); pointer-events: none; }
+.cta-inner h2 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; color: #fff; }
+.cta-inner p { color: var(--text-2); font-size: 15px; margin-bottom: 32px; line-height: 1.6; }
+
+/* ── FOOTER ── */
+footer {
+  position: relative; border-top: 1px solid var(--border); padding: 28px 48px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+}
+.footer-brand { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text-3); }
+.footer-brand em { font-style: normal; color: var(--accent); }
+footer small { font-size: 12px; color: var(--text-3); }
+
+/* ── SERVER SELECT MODAL ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(14px); z-index: 1000;
+  display: none; align-items: center; justify-content: center; padding: 24px;
+}
+.overlay.open { display: flex; animation: fadein 0.18s ease; }
+@keyframes fadein { from{opacity:0} to{opacity:1} }
+.modal {
+  background: var(--bg-2); border: 1px solid var(--border-md); border-radius: var(--radius-xl);
+  width: 100%; max-width: 520px; overflow: hidden;
+  animation: slideup 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideup { from{transform:translateY(18px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-hd {
+  padding: 22px 26px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.modal-hd h2 { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+.modal-hd p { font-size: 12.5px; color: var(--text-2); margin-top: 3px; }
+.modal-close {
+  width: 30px; height: 30px; background: var(--bg-4); border: 1px solid var(--border-md);
+  border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-2); font-size: 16px; flex-shrink: 0; transition: all 0.15s;
+}
+.modal-close:hover { background: var(--bg-5); color: var(--text); }
+.modal-search { padding: 14px 22px; border-bottom: 1px solid var(--border); position: relative; }
+.modal-search svg { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; stroke: var(--text-3); fill: none; stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+.modal-search input {
+  width: 100%; background: var(--bg-3); border: 1px solid var(--border-md); border-radius: 9px;
+  padding: 9px 14px 9px 36px; font-family: 'Inter', sans-serif; font-size: 13.5px;
+  color: var(--text); outline: none; transition: border-color 0.18s;
+}
+.modal-search input::placeholder { color: var(--text-3); }
+.modal-search input:focus { border-color: rgba(200,146,42,0.38); }
+.server-list { max-height: 340px; overflow-y: auto; padding: 8px 14px; }
+.server-lbl { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 10px 6px; font-family: 'JetBrains Mono', monospace; }
+.server-row {
+  display: flex; align-items: center; gap: 13px; padding: 10px 12px;
+  border-radius: 10px; cursor: pointer; transition: background 0.15s; border: 1px solid transparent;
+}
+.server-row:hover { background: var(--bg-4); }
+.server-row.sel { background: var(--accent-dim); border-color: rgba(200,146,42,0.2); }
+.server-av {
+  width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 13px; border: 1px solid transparent;
+  background: var(--bg-4);
+}
+.server-av img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; display: block; }
+.server-name { font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.server-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.server-info { flex: 1; min-width: 0; }
+.server-tick {
+  width: 18px; height: 18px; background: var(--accent); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  opacity: 0; transition: opacity 0.15s;
+}
+.server-tick svg { width: 10px; height: 10px; stroke: #000; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+.server-row.sel .server-tick { opacity: 1; }
+.modal-ft {
+  padding: 14px 22px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.modal-ft-note { font-size: 12.5px; color: var(--text-3); }
+#openDashBtn { opacity: 0.3; pointer-events: none; }
+#openDashBtn.ready { opacity: 1; pointer-events: auto; }
+
+/* ── DASHBOARD ── */
+.dash-view {
+  position: fixed; inset: 0; background: var(--bg); z-index: 2000;
+  display: none; flex-direction: column; overflow: hidden;
+}
+.dash-view.open { display: flex; }
+.dash-topbar {
+  background: var(--bg-2); border-bottom: 1px solid var(--border);
+  padding: 0 20px; height: 54px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0;
+}
+.dash-topbar-left { display: flex; align-items: center; gap: 16px; }
+.back-btn {
+  display: flex; align-items: center; gap: 7px; background: none;
+  border: 1px solid var(--border-md); border-radius: 8px; padding: 6px 13px;
+  color: var(--text-2); font-family: 'Inter', sans-serif; font-size: 12.5px;
+  font-weight: 500; cursor: pointer; transition: all 0.18s;
+}
+.back-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+.back-btn:hover { background: var(--bg-3); color: var(--text); }
+.dash-server-pill { display: flex; align-items: center; gap: 9px; }
+.dash-av {
+  width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800;
+}
+.dash-av img { width: 100%; height: 100%; border-radius: 7px; object-fit: cover; display: block; }
+.dash-server-name { font-size: 13.5px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+.dash-server-sub { font-size: 11px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; }
+.dash-conn {
+  display: flex; align-items: center; gap: 7px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-3);
+}
+.dash-conn.live { color: var(--green); }
+.dash-conn.err  { color: var(--red); }
+.dash-body { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 210px; flex-shrink: 0; background: var(--bg-2);
+  border-right: 1px solid var(--border); padding: 12px 8px;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 1px;
+}
+.sb-lbl {
+  font-size: 10px; font-weight: 600; color: var(--text-3); letter-spacing: 1.4px;
+  text-transform: uppercase; padding: 12px 10px 5px; font-family: 'JetBrains Mono', monospace;
+}
+.sb-lbl:first-child { padding-top: 4px; }
+.sb-item {
+  display: flex; align-items: center; gap: 9px; padding: 8px 10px;
+  border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-2);
+  cursor: pointer; transition: all 0.15s; border: 1px solid transparent; user-select: none;
+}
+.sb-item:hover { background: var(--bg-4); color: var(--text); }
+.sb-item.active { background: var(--accent-dim); border-color: rgba(200,146,42,0.18); color: var(--accent-hi); }
+.sb-item svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.sb-count {
+  margin-left: auto; font-size: 10.5px; font-family: 'JetBrains Mono', monospace;
+  color: var(--text-3); background: var(--bg-5); padding: 1px 7px; border-radius: 100px;
+}
+.sb-item.active .sb-count { background: rgba(200,146,42,0.15); color: var(--accent); }
+
+/* ── MAIN PANEL ── */
+.dash-main { flex: 1; overflow-y: auto; background: var(--bg); }
+.panel-hd {
+  padding: 28px 32px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
+}
+.panel-title { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.panel-sub { font-size: 12.5px; color: var(--text-2); margin-top: 5px; line-height: 1.5; }
+.panel-body { padding: 24px 32px 48px; }
+
+/* ── COMMAND CARDS ── */
+.search-row { position: relative; }
+.search-row svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--text-3); fill: none; stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+.search-row input {
+  background: var(--bg-3); border: 1px solid var(--border-md); border-radius: 9px;
+  padding: 8px 14px 8px 34px; font-family: 'Inter', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; width: 210px; transition: border-color 0.18s;
+}
+.search-row input:focus { border-color: rgba(200,146,42,0.35); }
+.search-row input::placeholder { color: var(--text-3); }
+.cmds-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 24px; }
+.cmd-card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 11px;
+  padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px;
+  transition: border-color 0.18s, transform 0.18s;
+}
+.cmd-card:hover { border-color: var(--border-md); transform: translateY(-1px); }
+.cmd-ico {
+  width: 34px; height: 34px; border-radius: 8px; background: var(--bg-4);
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cmd-ico svg { width: 15px; height: 15px; stroke: var(--text-2); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.cmd-body { flex: 1; min-width: 0; }
+.cmd-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; flex-wrap: wrap; }
+.cmd-name { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 500; color: #fff; }
+.badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+.badge-staff { background: var(--blue-dim); color: var(--blue); }
+.badge-admin { background: rgba(200,146,42,0.15); color: var(--accent-hi); }
+.cmd-desc { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.no-results { grid-column: 1/-1; text-align: center; padding: 48px 20px; color: var(--text-3); font-size: 13.5px; }
+
+/* ── SETTINGS PANELS ── */
+.settings-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.settings-card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.settings-card-hd {
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.settings-card-hd h3 { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: -0.2px; }
+.settings-card-hd p { font-size: 12px; color: var(--text-2); margin-top: 3px; }
+.settings-card-body { padding: 0; }
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 16px 22px; border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:hover { background: rgba(255,255,255,0.015); }
+.settings-row.disabled { opacity: 0.4; pointer-events: none; }
+.settings-row-label { flex: 1; min-width: 0; }
+.settings-row-label strong { font-size: 13.5px; font-weight: 600; color: var(--text); display: block; letter-spacing: -0.15px; }
+.settings-row-label span { font-size: 12px; color: var(--text-2); margin-top: 3px; display: block; line-height: 1.4; }
+.settings-row-control { flex-shrink: 0; display: flex; align-items: center; gap: 10px; }
+
+/* Toggle switch */
+.toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; cursor: pointer; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0; background: var(--bg-5); border-radius: 100px;
+  transition: background 0.2s; border: 1px solid var(--border-md);
+}
+.toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--text-2); transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.toggle input:checked ~ .toggle-track { background: var(--accent); border-color: var(--accent); }
+.toggle input:checked ~ .toggle-track + .toggle-thumb { transform: translateX(18px); background: #fff; }
+.toggle input:checked ~ .toggle-thumb { transform: translateX(18px); background: #fff; }
+/* simpler sibling approach */
+.toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
+.toggle-track + .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--text-2); transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), background 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.toggle input:checked + .toggle-track + .toggle-thumb { transform: translateX(18px); background: #fff; }
+
+/* Select */
+.settings-select {
+  background: var(--bg-3); border: 1px solid var(--border-md); border-radius: 8px;
+  padding: 7px 30px 7px 12px; font-family: 'Inter', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; cursor: pointer; transition: border-color 0.18s;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%237A7A7A' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  min-width: 150px;
+}
+.settings-select:focus { border-color: rgba(200,146,42,0.38); }
+
+/* Text input in settings */
+.settings-input {
+  background: var(--bg-3); border: 1px solid var(--border-md); border-radius: 8px;
+  padding: 7px 12px; font-family: 'Inter', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; transition: border-color 0.18s; width: 200px;
+}
+.settings-input:focus { border-color: rgba(200,146,42,0.38); }
+.settings-input::placeholder { color: var(--text-3); }
+
+/* Bad words list */
+.badword-area { padding: 16px 22px; }
+.badword-add-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.badword-add-row input {
+  flex: 1; background: var(--bg-3); border: 1px solid var(--border-md); border-radius: 8px;
+  padding: 8px 12px; font-family: 'Inter', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; transition: border-color 0.18s;
+}
+.badword-add-row input:focus { border-color: rgba(200,146,42,0.38); }
+.badword-add-row input::placeholder { color: var(--text-3); }
+.badword-list { display: flex; flex-wrap: wrap; gap: 7px; min-height: 40px; }
+.bwtag {
+  display: flex; align-items: center; gap: 6px; padding: 4px 10px;
+  background: var(--bg-4); border: 1px solid var(--border-md); border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-2);
+}
+.bwtag button {
+  background: none; border: none; cursor: pointer; color: var(--text-3);
+  font-size: 13px; padding: 0; line-height: 1; display: flex; align-items: center;
+  transition: color 0.15s;
+}
+.bwtag button:hover { color: var(--red); }
+.badword-empty { font-size: 13px; color: var(--text-3); padding: 8px 0; }
+
+/* Status chip */
+.status-chip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px;
+  border-radius: 100px; font-size: 11.5px; font-weight: 600; font-family: 'JetBrains Mono', monospace;
+}
+.chip-on  { background: var(--green-dim); color: var(--green); }
+.chip-off { background: var(--bg-4); color: var(--text-3); }
+.chip-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+/* Loading / error states */
+.loading-state { display: flex; align-items: center; gap: 10px; padding: 40px 0; color: var(--text-3); font-size: 13.5px; justify-content: center; }
+.spinner { width: 18px; height: 18px; border: 2px solid var(--bg-5); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.error-state { display: flex; align-items: flex-start; gap: 12px; padding: 20px 22px; background: var(--red-dim); border: 1px solid rgba(224,84,84,0.18); border-radius: var(--radius); margin-top: 8px; }
+.error-state svg { width: 16px; height: 16px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; margin-top: 1px; }
+.error-state p { font-size: 13px; color: var(--red); line-height: 1.5; }
+.save-btn-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 16px 22px; border-top: 1px solid var(--border); }
+.save-note { font-size: 12px; color: var(--text-3); }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+  background: var(--bg-3); border: 1px solid var(--border-md); border-radius: 10px;
+  padding: 13px 18px; font-size: 13.5px; font-weight: 500; color: var(--text);
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  opacity: 0; transform: translateY(8px); transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none; max-width: 320px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast svg { width: 16px; height: 16px; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+.toast-ok svg { stroke: var(--green); }
+.toast-err svg { stroke: var(--red); }
+.toast-ok { border-color: rgba(61,186,111,0.2); }
+.toast-err { border-color: rgba(224,84,84,0.2); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state h3 { font-size: 15px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; }
+.empty-state p { font-size: 13px; color: var(--text-3); line-height: 1.6; }
+
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero h1 { font-size: 36px; letter-spacing: -1.5px; }
+  .hero-floor { gap: 28px; }
+  .features-grid { grid-template-columns: 1fr; }
+  .sidebar { width: 180px; }
+  .cmds-grid { grid-template-columns: 1fr; }
+  .panel-hd { flex-direction: column; gap: 12px; }
+  .cta-inner { padding: 40px 24px; }
+  footer { flex-direction: column; gap: 8px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo" aria-label="NexaBot home">
+    <div class="nav-logo-img">
+      <svg viewBox="0 0 16 16" fill="none" stroke="#C8922A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2L2 5v4c0 3 2.5 5 6 5s6-2 6-5V5L8 2z"/><path d="M6 8l1.5 1.5L10 6"/></svg>
+    </div>
+    <span class="nav-wordmark">Nexa<em>Bot</em></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#commands">Commands</a></li>
+    <li><a href="#support">Support</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#" class="btn btn-ghost">Invite to Server</a>
+    <button class="btn btn-primary" onclick="openServerModal()">Dashboard</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-ambient"></div>
+  <div class="hero-content">
+    <div class="hero-logo">
+      <img src="nexa-logo.png" alt="NexaBot" onerror="this.style.display='none'">
+      <svg viewBox="0 0 40 40" fill="none" stroke="#C8922A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4L4 12v10c0 8 6 14 16 14s16-6 16-14V12L20 4z"/><path d="M15 20l4 4 7-7"/></svg>
+    </div>
+    <div class="hero-status mono">
+      <span class="status-pip"></span>
+      v12 &middot; All systems operational
+    </div>
+    <h1>The last bot your<br>server will ever <span class="hi">need.</span></h1>
+    <p class="hero-sub">Moderation, economy, leveling, and automation — all configurable from one dashboard built for server owners who care about the details.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary btn-lg" onclick="openServerModal()">Open Dashboard</button>
+      <div class="hero-rule"></div>
+      <a href="#" class="btn btn-ghost btn-lg">Invite to Server</a>
+    </div>
+    <div class="hero-floor">
+      <div class="floor-stat"><div class="num" id="stat-servers">—</div><div class="lbl">Servers</div></div>
+      <div class="floor-stat"><div class="num" id="stat-members">—</div><div class="lbl">Members</div></div>
+      <div class="floor-stat"><div class="num" id="stat-uptime">—</div><div class="lbl">Uptime</div></div>
+      <div class="floor-stat"><div class="num" id="stat-commands">—</div><div class="lbl">Commands</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-hd">
+    <div class="eyebrow">Core modules</div>
+    <h2 class="section-h">Everything your community needs</h2>
+    <p class="section-sub">Six modules, each fully configurable from your dashboard in real time.</p>
+  </div>
+  <div class="features-grid">
+    <div class="fcard">
+      <div class="fcard-icon"><svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4M6 20v-2c0-2.2 2.7-4 6-4s6 1.8 6 4v2"/></svg></div>
+      <h3>Fun &amp; Games</h3>
+      <p>Trivia, blackjack, hangman, connect four, wordchain, and more. Keep members engaged with interactive commands.</p>
+      <div class="fcard-tag">fun.*</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 6v6l4 2"/></svg></div>
+      <h3>Economy</h3>
+      <p>A full coin economy with a bank, shop, fishing, mining, heists, gambling, and server-wide leaderboards.</p>
+      <div class="fcard-tag">eco.*</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div>
+      <h3>Leveling</h3>
+      <p>XP tracking, level roles, voice activity points, and a fully configurable multiplier per server.</p>
+      <div class="fcard-tag">xp.*</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <h3>Moderation</h3>
+      <p>Bans, mutes, warns, purge, anti-raid, anti-nuke, automod, panic mode, and full case history.</p>
+      <div class="fcard-tag">mod.*</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M12 2v2M4.93 4.93l1.41 1.41M2 12h2M4.93 19.07l1.41-1.41M12 20v2M19.07 19.07l-1.41-1.41M20 12h2"/></svg></div>
+      <h3>Utility</h3>
+      <p>Polls, giveaways, reminders, reaction roles, AFK status, server info, and AI chat integration.</p>
+      <div class="fcard-tag">util.*</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <h3>Setup &amp; Config</h3>
+      <p>Welcome messages, logging channels, verification, stats channels, and plugin management — all in one place.</p>
+      <div class="fcard-tag">setup.*</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-strip">
+  <div class="cta-inner">
+    <div class="eyebrow">Get started</div>
+    <h2>Configure in seconds</h2>
+    <p>Select a server, browse your commands, and manage automod and plugins from one place.</p>
+    <button class="btn btn-primary btn-lg" onclick="openServerModal()">Open Dashboard</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">Nexa<em>Bot</em></div>
+  <small>Built for Discord communities that care about quality.</small>
+  <small>&copy; 2025 NexaBot. All rights reserved.</small>
+</footer>
+
+<!-- SERVER MODAL -->
+<div class="overlay" id="serverModal" onclick="if(event.target===this)closeServerModal()">
+  <div class="modal" role="dialog" aria-label="Select a server">
+    <div class="modal-hd">
+      <div>
+        <h2>Select a server</h2>
+        <p>Choose which server to configure</p>
+      </div>
+      <button class="modal-close" onclick="closeServerModal()" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="modal-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="serverSearch" placeholder="Search servers..." oninput="filterServers(this.value)" autocomplete="off">
+    </div>
+    <div class="server-list" id="serverList"></div>
+    <div class="modal-ft">
+      <span class="modal-ft-note" id="selectedNote">No server selected</span>
+      <button class="btn btn-primary" id="openDashBtn" onclick="openDashboard()">Configure</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash-view" id="dashView" role="main">
+  <div class="dash-topbar">
+    <div class="dash-topbar-left">
+      <button class="back-btn" onclick="closeDashboard()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back
+      </button>
+      <div class="dash-server-pill">
+        <div class="dash-av" id="dashAv"></div>
+        <div>
+          <div class="dash-server-name" id="dashName"></div>
+          <div class="dash-server-sub mono">NexaBot Dashboard</div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-conn" id="dashConn">
+      <div class="status-pip"></div>
+      <span id="dashConnLabel">Connecting...</span>
+    </div>
+  </div>
+  <div class="dash-body">
+    <nav class="sidebar" id="sidebar" aria-label="Dashboard navigation"></nav>
+    <main class="dash-main" id="dashMain"></main>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="alert" aria-live="polite">
+  <svg viewBox="0 0 24 24" id="toastIcon"></svg>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const API_BASE = '/proxy';
+const API_SECRET = 'nexa_8x9KqP2vR7mZ4wL1tY6bN3sH0jF5dC8a'; // set API_SECRET= in your .env
+
+// ── API HELPERS ──────────────────────────────────────────────────────────────
+const headers = () => ({ 'Authorization': `Bearer ${API_SECRET}`, 'Content-Type': 'application/json' });
+
+async function apiGet(path) {
+  const r = await fetch(API_BASE + path, { headers: headers() });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+async function apiPost(path, body) {
+  const r = await fetch(API_BASE + path, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  const icon = document.getElementById('toastIcon');
+  document.getElementById('toastMsg').textContent = msg;
+  el.className = `toast toast-${type} show`;
+  icon.innerHTML = type === 'ok'
+    ? '<polyline points="20 6 9 17 4 12" stroke-linejoin="round"/>'
+    : '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.classList.remove('show'); }, 3000);
+}
+
+// ── LIVE STATS ON HOMEPAGE ───────────────────────────────────────────────────
+async function loadHeroStats() {
+  try {
+    const data = await apiGet('/api/stats');
+    const fmt = n => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(0)+'k+' : String(n);
+    document.getElementById('stat-servers').textContent  = fmt(data.servers  || 0);
+    document.getElementById('stat-members').textContent  = fmt(data.members  || 0);
+    document.getElementById('stat-commands').textContent = data.commands || '—';
+    const h = Math.floor((data.uptime||0)/3600);
+    document.getElementById('stat-uptime').textContent = h >= 24 ? Math.floor(h/24)+'d' : h+'h';
+  } catch {
+    // silently leave dashes — bot may be offline
+  }
+}
+loadHeroStats();
+
+// ── SERVER MODAL ─────────────────────────────────────────────────────────────
+let allServers = [];
+let selectedServer = null;
+
+async function openServerModal() {
+  document.getElementById('serverModal').classList.add('open');
+  const list = document.getElementById('serverList');
+  list.innerHTML = `<div class="loading-state"><div class="spinner"></div> Loading your servers...</div>`;
+  try {
+    const data = await apiGet('/api/servers');
+    allServers = data.servers || [];
+    renderServerList(allServers);
+  } catch (e) {
+    list.innerHTML = `<div style="padding:20px 22px">
+      <div class="error-state">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <p>Could not reach the bot API. Make sure the bot is running and API_PORT is open on WispByte.</p>
+      </div>
+    </div>`;
+  }
+}
+
+function renderServerList(servers) {
+  const list = document.getElementById('serverList');
+  if (!servers.length) {
+    list.innerHTML = `<div class="empty-state"><h3>No servers found</h3><p>The bot isn't in any servers yet, or your search didn't match anything.</p></div>`;
+    return;
+  }
+  const initials = name => name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || 'SV';
+  const colors = ['#C8922A','#5B8FF4','#3DBA6F','#E05454','#A78BFA','#F59E0B','#06B6D4'];
+  const color  = (id, name) => colors[(name.charCodeAt(0)||0) % colors.length];
+  list.innerHTML = `<div class="server-lbl">Servers (${servers.length})</div>` +
+    servers.map(s => {
+      const c = color(s.id, s.name);
+      const sel = selectedServer && selectedServer.id === s.id;
+      const av  = s.icon
+        ? `<img src="${s.icon}" alt="${s.name}">`
+        : `<span style="color:${c}">${initials(s.name)}</span>`;
+      return `
+      <div class="server-row${sel?' sel':''}" onclick="selectServer('${s.id}')" id="sr-${s.id}">
+        <div class="server-av" style="background:${c}18;border-color:${c}33">${av}</div>
+        <div class="server-info">
+          <div class="server-name">${s.name}</div>
+          <div class="server-meta">${(s.members||0).toLocaleString()} members</div>
+        </div>
+        <div class="server-tick">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke-linejoin="round"/></svg>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function selectServer(id) {
+  selectedServer = allServers.find(s => String(s.id) === String(id));
+  document.querySelectorAll('.server-row').forEach(r => r.classList.remove('sel'));
+  const row = document.getElementById('sr-' + id);
+  if (row) row.classList.add('sel');
+  document.getElementById('selectedNote').textContent = `Selected: ${selectedServer.name}`;
+  document.getElementById('openDashBtn').classList.add('ready');
+}
+
+function filterServers(q) {
+  renderServerList(allServers.filter(s => s.name.toLowerCase().includes(q.toLowerCase())));
+}
+
+function closeServerModal() { document.getElementById('serverModal').classList.remove('open'); }
+
+// ── DASHBOARD ────────────────────────────────────────────────────────────────
+const initials = name => (name||'').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || 'SV';
+const colors = ['#C8922A','#5B8FF4','#3DBA6F','#E05454','#A78BFA','#F59E0B','#06B6D4'];
+const avatarColor = name => colors[(name.charCodeAt(0)||0) % colors.length];
+
+function openDashboard() {
+  if (!selectedServer) return;
+  closeServerModal();
+  const c = avatarColor(selectedServer.name);
+  const av = document.getElementById('dashAv');
+  av.style.cssText = `background:${c}18;color:${c};border:1px solid ${c}33;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;`;
+  if (selectedServer.icon) {
+    av.innerHTML = `<img src="${selectedServer.icon}" style="width:100%;height:100%;border-radius:7px;object-fit:cover;" alt="">`;
+  } else {
+    av.textContent = initials(selectedServer.name);
+  }
+  document.getElementById('dashName').textContent = selectedServer.name;
+  setConnStatus('connecting');
+  buildSidebar();
+  switchTab('overview');
+  document.getElementById('dashView').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // test connection
+  apiGet('/api/ping').then(() => setConnStatus('live')).catch(() => setConnStatus('err'));
+}
+
+function closeDashboard() {
+  document.getElementById('dashView').classList.remove('open');
+  document.body.style.overflow = '';
+  openServerModal();
+}
+
+function setConnStatus(state) {
+  const el = document.getElementById('dashConn');
+  const lb = document.getElementById('dashConnLabel');
+  el.className = 'dash-conn' + (state === 'live' ? ' live' : state === 'err' ? ' err' : '');
+  lb.textContent = state === 'live' ? 'Connected' : state === 'err' ? 'Offline' : 'Connecting...';
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+const NAV = [
+  { key: 'overview', label: 'Overview', icon: `<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>` },
+  { key: 'automod',  label: 'Automod',  icon: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>` },
+  { key: 'plugins',  label: 'Plugins',  icon: `<path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/>` },
+  null, // divider
+  { key: 'fun',       label: 'Fun',        icon: `<circle cx="12" cy="12" r="2"/><path d="M20.2 7.9A9 9 0 1 0 21 12"/>`, count: true },
+  { key: 'economy',   label: 'Economy',    icon: `<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>`, count: true },
+  { key: 'utility',   label: 'Utility',    icon: `<circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41"/>`, count: true },
+  { key: 'moderation',label: 'Moderation', icon: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`, count: true },
+  { key: 'setup',     label: 'Setup',      icon: `<circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a9 9 0 1 0-14.14 0"/>`, count: true },
+  { key: 'developer', label: 'Developer',  icon: `<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>`, count: true },
+];
+
+let currentTab = 'overview';
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '<div class="sb-lbl">Dashboard</div>';
+  NAV.forEach(item => {
+    if (item === null) { sb.innerHTML += '<div class="sb-lbl" style="margin-top:8px">Commands</div>'; return; }
+    const countSpan = item.count && TABS[item.key] ? `<span class="sb-count">${TABS[item.key].commands.length}</span>` : '';
+    sb.innerHTML += `<div class="sb-item${item.key===currentTab?' active':''}" onclick="switchTab('${item.key}')" id="si-${item.key}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0">${item.icon}</svg>
+      ${item.label}
+      ${countSpan}
+    </div>`;
+  });
+}
+
+function switchTab(key) {
+  currentTab = key;
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const el = document.getElementById('si-' + key);
+  if (el) el.classList.add('active');
+  loadTab(key);
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+async function loadTab(key) {
+  const main = document.getElementById('dashMain');
+  main.scrollTop = 0;
+  if (key === 'overview') return renderOverview(main);
+  if (key === 'automod')  return renderAutomod(main);
+  if (key === 'plugins')  return renderPlugins(main);
+  const tab = TABS[key];
+  if (tab) renderCommands(main, tab);
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────────────────
+async function renderOverview(main) {
+  main.innerHTML = `
+    <div class="panel-hd">
+      <div><div class="panel-title">Overview</div><div class="panel-sub">Live stats for ${selectedServer.name}</div></div>
+    </div>
+    <div class="panel-body">
+      <div class="loading-state"><div class="spinner"></div> Loading stats...</div>
+    </div>`;
+  try {
+    const [stats, plugins, automod] = await Promise.all([
+      apiGet('/api/stats'),
+      apiGet('/api/plugins?guild=' + selectedServer.id),
+      apiGet('/api/automod?guild='  + selectedServer.id),
+    ]);
+    const s = selectedServer;
+    const enabledCount = (plugins.enabled||[]).length;
+    const totalPlugins  = (plugins.available||[]).length;
+    main.querySelector('.panel-body').innerHTML = `
+      <div class="settings-stack">
+        <div class="settings-card">
+          <div class="settings-card-hd"><div><h3>Bot Status</h3><p>Live data from the NexaBot API</p></div></div>
+          <div class="settings-card-body">
+            <div class="settings-row">
+              <div class="settings-row-label"><strong>Ping</strong><span>WebSocket latency to Discord</span></div>
+              <div class="settings-row-control"><span class="mono" style="font-size:13px;color:var(--green)">${stats.ping}ms</span></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label"><strong>Uptime</strong><span>Time since last restart</span></div>
+              <div class="settings-row-control"><span class="mono" style="font-size:13px;color:var(--text)">${fmtUptime(stats.uptime)}</span></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label"><strong>Memory</strong><span>Heap usage</span></div>
+              <div class="settings-row-control"><span class="mono" style="font-size:13px;color:var(--text)">${stats.memory?.used}MB / ${stats.memory?.total}MB</span></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label"><strong>Total servers</strong><span>Servers the bot is in</span></div>
+              <div class="settings-row-control"><span class="mono" style="font-size:13px;color:var(--text)">${stats.servers}</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-card">
+          <div class="settings-card-hd"><div><h3>${s.name}</h3><p>This server's current configuration</p></div></div>
+          <div class="settings-card-body">
+            <div class="settings-row">
+              <div class="settings-row-label"><strong>Members</strong></div>
+              <div class="settings-row-control"><span class="mono" style="font-size:13px;color:var(--text)">${(s.members||0).toLocaleString()}</span></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label"><strong>Automod</strong><span>Content filtering status</span></div>
+              <div class="settings-row-control">
+                <span class="status-chip ${automod.enabled ? 'chip-on' : 'chip-off'}">
+                  <span class="chip-dot"></span>${automod.enabled ? 'Enabled' : 'Disabled'}
+                </span>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label"><strong>Plugins active</strong><span>Modules currently enabled</span></div>
+              <div class="settings-row-control"><span class="mono" style="font-size:13px;color:var(--text)">${enabledCount} / ${totalPlugins}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  } catch(e) {
+    main.querySelector('.panel-body').innerHTML = `<div class="error-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p>Could not load stats. Check that the bot API is reachable.</p></div>`;
+  }
+}
+
+function fmtUptime(s) {
+  const d = Math.floor(s/86400), h = Math.floor((s%86400)/3600), m = Math.floor((s%3600)/60);
+  if (d) return `${d}d ${h}h`;
+  if (h) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+// ── AUTOMOD ───────────────────────────────────────────────────────────────────
+let automodState = null;
+
+async function renderAutomod(main) {
+  main.innerHTML = `
+    <div class="panel-hd">
+      <div><div class="panel-title">Automod</div><div class="panel-sub">Automatic content filtering for ${selectedServer.name}</div></div>
+    </div>
+    <div class="panel-body">
+      <div class="loading-state"><div class="spinner"></div> Loading automod settings...</div>
+    </div>`;
+  try {
+    const data = await apiGet('/api/automod?guild=' + selectedServer.id);
+    automodState = data;
+    main.querySelector('.panel-body').innerHTML = buildAutomodUI(data);
+    attachAutomodHandlers();
+  } catch {
+    main.querySelector('.panel-body').innerHTML = `<div class="error-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p>Failed to load automod settings.</p></div>`;
+  }
+}
+
+function buildAutomodUI(data) {
+  const words = (data.badWords || []);
+  return `
+    <div class="settings-stack">
+      <div class="settings-card">
+        <div class="settings-card-hd">
+          <div><h3>Filtering</h3><p>Controls what content the bot automatically catches and removes</p></div>
+        </div>
+        <div class="settings-card-body">
+          <div class="settings-row">
+            <div class="settings-row-label">
+              <strong>Automod enabled</strong>
+              <span>When on, the bot will scan messages and take action on rule violations</span>
+            </div>
+            <div class="settings-row-control">
+              <label class="toggle" aria-label="Toggle automod">
+                <input type="checkbox" id="tog-automod" ${data.enabled ? 'checked' : ''}>
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card" id="badword-card" style="${data.enabled ? '' : 'opacity:0.5;pointer-events:none'}">
+        <div class="settings-card-hd">
+          <div><h3>Blocked words</h3><p>Messages containing these words will be automatically deleted</p></div>
+        </div>
+        <div class="settings-card-body">
+          <div class="badword-area">
+            <div class="badword-add-row">
+              <input type="text" id="badword-input" placeholder="Add a word or phrase..." maxlength="80" autocomplete="off">
+              <button class="btn btn-accent btn-sm" onclick="addBadWord()">Add</button>
+            </div>
+            <div class="badword-list" id="badword-list">
+              ${words.length
+                ? words.map(w => `<div class="bwtag" id="bw-${btoa(w).replace(/=/g,'')}"><span class="mono">${w}</span><button onclick="removeBadWord('${w}')" title="Remove">&times;</button></div>`).join('')
+                : `<span class="badword-empty">No blocked words yet. Add one above.</span>`}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function attachAutomodHandlers() {
+  const tog = document.getElementById('tog-automod');
+  if (!tog) return;
+  tog.addEventListener('change', async () => {
+    const val = tog.checked;
+    try {
+      await apiPost('/api/automod?guild=' + selectedServer.id, { enabled: val });
+      automodState.enabled = val;
+      document.getElementById('badword-card').style.cssText = val ? '' : 'opacity:0.5;pointer-events:none';
+      showToast(`Automod ${val ? 'enabled' : 'disabled'}`);
+    } catch {
+      tog.checked = !val;
+      showToast('Failed to save — check connection', 'err');
+    }
+  });
+  const input = document.getElementById('badword-input');
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') addBadWord(); });
+}
+
+async function addBadWord() {
+  const input = document.getElementById('badword-input');
+  const word  = (input.value || '').trim().toLowerCase();
+  if (!word) return;
+  try {
+    const data = await apiPost('/api/automod?guild=' + selectedServer.id, { addWord: word });
+    input.value = '';
+    const list = document.getElementById('badword-list');
+    const empty = list.querySelector('.badword-empty');
+    if (empty) empty.remove();
+    const key = btoa(word).replace(/=/g, '');
+    if (!document.getElementById('bw-' + key)) {
+      list.insertAdjacentHTML('beforeend', `<div class="bwtag" id="bw-${key}"><span class="mono">${word}</span><button onclick="removeBadWord('${word}')" title="Remove">&times;</button></div>`);
+    }
+    showToast(`"${word}" added`);
+  } catch {
+    showToast('Failed to add word', 'err');
+  }
+}
+
+async function removeBadWord(word) {
+  try {
+    await apiPost('/api/automod?guild=' + selectedServer.id, { removeWord: word });
+    const key = btoa(word).replace(/=/g, '');
+    const el  = document.getElementById('bw-' + key);
+    if (el) el.remove();
+    const list = document.getElementById('badword-list');
+    if (!list.children.length) list.innerHTML = `<span class="badword-empty">No blocked words yet. Add one above.</span>`;
+    showToast(`"${word}" removed`);
+  } catch {
+    showToast('Failed to remove word', 'err');
+  }
+}
+
+// ── PLUGINS ───────────────────────────────────────────────────────────────────
+const PLUGIN_META = {
+  economy:  { label: 'Economy',  desc: 'Coin economy, bank, shop, fishing, mining, gambling, and leaderboards.' },
+  levels:   { label: 'Leveling', desc: 'XP tracking, level roles, voice activity points, and multiplier config.' },
+  fun:      { label: 'Fun',      desc: 'Trivia, blackjack, hangman, wordchain, connect four, and other games.' },
+  music:    { label: 'Music',    desc: 'Audio playback and queue management in voice channels.' },
+  utility:  { label: 'Utility',  desc: 'Polls, giveaways, reminders, reaction roles, and AFK status tracking.' },
+};
+
+let pluginState = null;
+
+async function renderPlugins(main) {
+  main.innerHTML = `
+    <div class="panel-hd">
+      <div><div class="panel-title">Plugins</div><div class="panel-sub">Enable or disable feature modules for ${selectedServer.name}</div></div>
+    </div>
+    <div class="panel-body">
+      <div class="loading-state"><div class="spinner"></div> Loading plugins...</div>
+    </div>`;
+  try {
+    const data = await apiGet('/api/plugins?guild=' + selectedServer.id);
+    pluginState = data;
+    main.querySelector('.panel-body').innerHTML = buildPluginsUI(data);
+    attachPluginHandlers(data);
+  } catch {
+    main.querySelector('.panel-body').innerHTML = `<div class="error-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p>Failed to load plugin settings.</p></div>`;
+  }
+}
+
+function buildPluginsUI(data) {
+  const available = data.available || Object.keys(PLUGIN_META);
+  const enabled   = new Set(data.enabled || []);
+  const rows = available.map(key => {
+    const meta = PLUGIN_META[key] || { label: key, desc: '' };
+    const on   = enabled.has(key);
+    return `
+      <div class="settings-row">
+        <div class="settings-row-label">
+          <strong>${meta.label}</strong>
+          <span>${meta.desc}</span>
+        </div>
+        <div class="settings-row-control">
+          <span class="status-chip ${on ? 'chip-on' : 'chip-off'}" id="plg-chip-${key}">
+            <span class="chip-dot"></span>${on ? 'Enabled' : 'Disabled'}
+          </span>
+          <label class="toggle" aria-label="Toggle ${meta.label}">
+            <input type="checkbox" id="plg-${key}" ${on ? 'checked' : ''} data-plugin="${key}">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="settings-stack">
+      <div class="settings-card">
+        <div class="settings-card-hd"><div><h3>Feature modules</h3><p>Changes take effect immediately — no restart required</p></div></div>
+        <div class="settings-card-body">${rows}</div>
+      </div>
+    </div>`;
+}
+
+function attachPluginHandlers(data) {
+  document.querySelectorAll('[data-plugin]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const key = input.dataset.plugin;
+      const on  = input.checked;
+      const chip = document.getElementById('plg-chip-' + key);
+      try {
+        await apiPost('/api/plugins?guild=' + selectedServer.id, on ? { enable: key } : { disable: key });
+        if (chip) {
+          chip.className = `status-chip ${on ? 'chip-on' : 'chip-off'}`;
+          chip.innerHTML = `<span class="chip-dot"></span>${on ? 'Enabled' : 'Disabled'}`;
+        }
+        showToast(`${PLUGIN_META[key]?.label || key} ${on ? 'enabled' : 'disabled'}`);
+      } catch {
+        input.checked = !on;
+        showToast('Failed to save — check connection', 'err');
+      }
+    });
+  });
+}
+
+// ── COMMAND TABS ──────────────────────────────────────────────────────────────
+const CMD_ICONS = {
+  '/help':'/info','/ban':'/shield','/kick':'/user','/mute':'/mic','/warn':'/alert',
+  '/balance':'/dollar','/pay':'/send','/leaderboard':'/bar','/level':'/star',
+  '/play':'/play','/skip':'/skip','/queue':'/list',
+};
+function cmdIcon(cmd) {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+  </svg>`;
+}
+
+function renderCommands(main, tab) {
+  main.innerHTML = `
+    <div class="panel-hd">
+      <div><div class="panel-title">${tab.label}</div><div class="panel-sub">${tab.sub}</div></div>
+      <div class="search-row">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Filter commands..." oninput="filterCmds('${tab.key}', this.value)" autocomplete="off">
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="cmds-grid" id="cmd-grid">${buildCmdGrid(tab.commands, '')}</div>
+    </div>`;
+}
+
+function buildCmdGrid(commands, query) {
+  const q = query.toLowerCase();
+  const list = q ? commands.filter(c => c.cmd.includes(q) || c.desc.toLowerCase().includes(q)) : commands;
+  if (!list.length) return `<div class="no-results">No commands match "<strong>${query}</strong>"</div>`;
+  return list.map(c => `
+    <div class="cmd-card">
+      <div class="cmd-ico">${cmdIcon(c.cmd)}</div>
+      <div class="cmd-body">
+        <div class="cmd-row">
+          <span class="cmd-name">${c.cmd}</span>
+          ${c.badge==='staff' ? '<span class="badge badge-staff">Staff</span>' : ''}
+          ${c.badge==='admin' ? '<span class="badge badge-admin">Admin</span>' : ''}
+        </div>
+        <div class="cmd-desc">${c.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+function filterCmds(key, q) {
+  const grid = document.getElementById('cmd-grid');
+  if (grid && TABS[key]) grid.innerHTML = buildCmdGrid(TABS[key].commands, q);
+}
+
+// ── COMMAND DATA ──────────────────────────────────────────────────────────────
+const TABS = {
+  fun: {
+    key:'fun', label:'Fun', sub:'Entertainment and game commands. All usable by regular members.',
+    commands:[
+      {cmd:'/trivia',    desc:'Start a trivia question in the current channel'},
+      {cmd:'/blackjack', desc:'Play blackjack against the bot for coins'},
+      {cmd:'/slots',     desc:'Spin the slot machine and try your luck'},
+      {cmd:'/tictactoe', desc:'Challenge another member to tic-tac-toe'},
+      {cmd:'/connect4',  desc:'Play connect four against another member'},
+      {cmd:'/hangman',   desc:'Start a game of hangman for the channel'},
+      {cmd:'/wordchain', desc:'Start a word chain game with other members'},
+      {cmd:'/riddle',    desc:'Get a riddle to solve for a reward'},
+      {cmd:'/meme',      desc:'Pull a random meme from Reddit'},
+      {cmd:'/8ball',     desc:'Ask the magic 8 ball a yes/no question'},
+      {cmd:'/coinflip',  desc:'Flip a coin — heads or tails'},
+      {cmd:'/roll',      desc:'Roll a dice with a configurable number of sides'},
+      {cmd:'/rps',       desc:'Play rock-paper-scissors against the bot'},
+    ]
+  },
+  economy: {
+    key:'economy', label:'Economy', sub:'Server economy commands. Members earn and spend coins through activity.',
+    commands:[
+      {cmd:'/balance',    desc:'Check your current wallet and bank balance'},
+      {cmd:'/daily',      desc:'Claim your daily coin reward'},
+      {cmd:'/work',       desc:'Work a shift to earn coins'},
+      {cmd:'/fish',       desc:'Go fishing and sell your catch for coins'},
+      {cmd:'/mine',       desc:'Mine for ore and sell it at the shop'},
+      {cmd:'/pay',        desc:'Transfer coins to another member'},
+      {cmd:'/deposit',    desc:'Move coins from your wallet into the bank'},
+      {cmd:'/withdraw',   desc:'Move coins from your bank to your wallet'},
+      {cmd:'/shop',       desc:'Browse and purchase items from the server shop'},
+      {cmd:'/inventory',  desc:'View your current item inventory'},
+      {cmd:'/leaderboard',desc:'View the top coin holders on this server'},
+      {cmd:'/heist',      desc:'Organize a group heist to rob the bank'},
+      {cmd:'/gamble',     desc:'Bet coins on a random outcome'},
+    ]
+  },
+  utility: {
+    key:'utility', label:'Utility', sub:'Useful tools and server management helpers for members and staff.',
+    commands:[
+      {cmd:'/userinfo',    desc:'View information about a member'},
+      {cmd:'/serverinfo',  desc:'View stats and info about this server'},
+      {cmd:'/avatar',      desc:'Get the full-size avatar of a member'},
+      {cmd:'/poll',        desc:'Create a yes/no or multi-option poll'},
+      {cmd:'/giveaway',    desc:'Start a timed giveaway for a prize',   badge:'staff'},
+      {cmd:'/remind',      desc:'Set a reminder for yourself or the server'},
+      {cmd:'/afk',         desc:'Set an AFK status shown when you are mentioned'},
+      {cmd:'/reactionrole',desc:'Set up a role assignment reaction on a message', badge:'staff'},
+      {cmd:'/automod',     desc:'Enable or disable automod rules',              badge:'admin'},
+      {cmd:'/plugin',      desc:'Enable or disable a feature module',           badge:'admin'},
+      {cmd:'/welcomeset',  desc:'Configure the welcome message channel',        badge:'admin'},
+    ]
+  },
+  moderation: {
+    key:'moderation', label:'Moderation', sub:'Member and server management. Mod and Admin tier commands.',
+    commands:[
+      {cmd:'/ban',       desc:'Permanently ban a member from the server',         badge:'staff'},
+      {cmd:'/unban',     desc:'Remove an active ban from a user',                 badge:'staff'},
+      {cmd:'/kick',      desc:'Remove a member from the server',                  badge:'staff'},
+      {cmd:'/mute',      desc:'Prevent a member from sending messages',           badge:'staff'},
+      {cmd:'/unmute',    desc:'Restore a muted member\'s messaging access',       badge:'staff'},
+      {cmd:'/warn',      desc:'Issue a formal warning to a member',               badge:'staff'},
+      {cmd:'/warns',     desc:'View the warning history for a member',            badge:'staff'},
+      {cmd:'/clearwarns',desc:'Remove all warnings from a member\'s record',      badge:'admin'},
+      {cmd:'/purge',     desc:'Bulk delete messages from a channel',              badge:'staff'},
+      {cmd:'/slowmode',  desc:'Set a message cooldown for a channel',             badge:'staff'},
+      {cmd:'/lock',      desc:'Prevent everyone from sending in a channel',       badge:'staff'},
+      {cmd:'/unlock',    desc:'Re-open a locked channel',                         badge:'staff'},
+      {cmd:'/antiraid',  desc:'Toggle anti-raid mode with configurable threshold',badge:'admin'},
+      {cmd:'/panicmode', desc:'Lockdown all channels in an emergency',            badge:'admin'},
+      {cmd:'/case',      desc:'Look up a specific moderation case by ID',         badge:'staff'},
+    ]
+  },
+  setup: {
+    key:'setup', label:'Setup', sub:'Server configuration. Admin-only commands.',
+    commands:[
+      {cmd:'/setprefix',    desc:'Change the bot\'s command prefix for this server', badge:'admin'},
+      {cmd:'/setlogs',      desc:'Set the channel where mod actions are logged',     badge:'admin'},
+      {cmd:'/setwelcome',   desc:'Configure the welcome message and channel',        badge:'admin'},
+      {cmd:'/setgoodbye',   desc:'Configure the goodbye message and channel',        badge:'admin'},
+      {cmd:'/setverify',    desc:'Enable captcha-based member verification',         badge:'admin'},
+      {cmd:'/setlevelrole', desc:'Assign a role to be granted at a specific level',  badge:'admin'},
+      {cmd:'/setxpmult',    desc:'Set a server-wide XP earning multiplier',          badge:'admin'},
+      {cmd:'/setstatschan', desc:'Create auto-updating stats channels',              badge:'admin'},
+      {cmd:'/setmuterole',  desc:'Designate the role used for muting members',       badge:'admin'},
+    ]
+  },
+  developer: {
+    key:'developer', label:'Developer', sub:'Bot diagnostics, content tools, and XP management utilities.',
+    commands:[
+      {cmd:'/botinfo',     desc:'View detailed statistics about NexaBot'},
+      {cmd:'/ping',        desc:'Check the bot\'s current latency and API response time'},
+      {cmd:'/uptime',      desc:'See how long the bot has been running without a restart'},
+      {cmd:'/stats',       desc:'View activity statistics for this server'},
+      {cmd:'/serverhealth',desc:'Get a health overview including any issues detected'},
+      {cmd:'/say',         desc:'Make the bot send a custom message in a channel', badge:'staff'},
+      {cmd:'/embed',       desc:'Send a custom embed message via the bot',         badge:'staff'},
+      {cmd:'/announce',    desc:'Post an announcement embed to the log channel',   badge:'staff'},
+      {cmd:'/givexp',      desc:'Manually grant XP to a member',                   badge:'staff'},
+      {cmd:'/resetxp',     desc:'Reset a member\'s XP and level to zero',          badge:'staff'},
+    ]
+  }
+};
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('dashView').classList.contains('open')) closeDashboard();
+  else closeServerModal();
+});
+</script>
+</body>
+</html>
