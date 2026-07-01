@@ -514,7 +514,7 @@ footer small { font-size: 12px; color: var(--text-3); }
   </ul>
   <div class="nav-cta">
     <a href="#" class="btn btn-ghost">Invite to Server</a>
-    <button class="btn btn-primary" onclick="openServerModal()">Dashboard</button>
+    <button class="btn btn-primary" onclick="currentUser ? openServerModal() : login()">Dashboard</button>
   </div>
 </nav>
 
@@ -667,23 +667,51 @@ footer small { font-size: 12px; color: var(--text-3); }
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────────────────
 const API_BASE = 'https://nexaproxy-ikfz.onrender.com';
-const API_SECRET = 'nexa_8x9KqP2vR7mZ4wL1tY6bN3sH0jF5dC8a'; // set API_SECRET= in your .env
 
-// ── API HELPERS ──────────────────────────────────────────────────────────────
-const headers = () => ({ 'Authorization': `Bearer ${API_SECRET}`, 'Content-Type': 'application/json' });
+// AUTH STATE
+let currentUser  = null;
+let currentGuilds = [];
 
+// API HELPERS
 async function apiGet(path) {
-  const r = await fetch(API_BASE + path, { headers: headers() });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const r = await fetch(API_BASE + path, { credentials: 'include' });
+  if (r.status === 401) { handleLogout(); throw new Error('Not logged in'); }
+  if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
 async function apiPost(path, body) {
-  const r = await fetch(API_BASE + path, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const r = await fetch(API_BASE + path, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (r.status === 401) { handleLogout(); throw new Error('Not logged in'); }
+  if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
 
-// ── TOAST ────────────────────────────────────────────────────────────────────
+// AUTH FUNCTIONS
+async function checkAuth() {
+  try {
+    const data = await fetch(API_BASE + '/auth/me', { credentials: 'include' }).then(r => r.json());
+    if (data.user) { currentUser = data.user; currentGuilds = data.guilds || []; updateNavForUser(); return true; }
+  } catch {}
+  return false;
+}
+
+function updateNavForUser() {
+  const cta = document.querySelector('.nav-cta');
+  if (!cta || !currentUser) return;
+  const av = currentUser.avatar
+    ? '<img src="https://cdn.discordapp.com/avatars/' + currentUser.id + '/' + currentUser.avatar + '.png?size=32" style="width:26px;height:26px;border-radius:50%;object-fit:cover;" alt="">'
+    : '<div style="width:26px;height:26px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent)">' + currentUser.username[0].toUpperCase() + '</div>';
+  cta.innerHTML = '<div style="display:flex;align-items:center;gap:8px;">' + av + '<span style="font-size:13px;font-weight:600;color:var(--text)">' + currentUser.username + '</span></div><button class="btn btn-ghost btn-sm" onclick="handleLogout()">Sign out</button><button class="btn btn-primary" onclick="currentUser ? openServerModal() : login()">Dashboard</button>';
+}
+
+function handleLogout() {
+  fetch(API_BASE + '/auth/logout', { credentials: 'include' });
+  currentUser = null; currentGuilds = [];
+  const cta = document.querySelector('.nav-cta');
+  if (cta) cta.innerHTML = '<a href="#" class="btn btn-ghost">Invite to Server</a><button class="btn btn-primary" onclick="login()">Sign in with Discord</button>';
+}
+
+function login() { window.location.href = API_BASE + '/auth/login'; }
 let toastTimer;
 function showToast(msg, type = 'ok') {
   const el = document.getElementById('toast');
@@ -718,21 +746,16 @@ let allServers = [];
 let selectedServer = null;
 
 async function openServerModal() {
+  // If not logged in, redirect to Discord login first
+  if (!currentUser) {
+    login();
+    return;
+  }
   document.getElementById('serverModal').classList.add('open');
   const list = document.getElementById('serverList');
-  list.innerHTML = `<div class="loading-state"><div class="spinner"></div> Loading your servers...</div>`;
-  try {
-    const data = await apiGet('/api/servers');
-    allServers = data.servers || [];
-    renderServerList(allServers);
-  } catch (e) {
-    list.innerHTML = `<div style="padding:20px 22px">
-      <div class="error-state">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-        <p>Could not reach the bot API. Make sure the bot is running and API_PORT is open on WispByte.</p>
-      </div>
-    </div>`;
-  }
+  list.innerHTML = '<div class="loading-state"><div class="spinner"></div> Loading your servers...</div>';
+  allServers = currentGuilds;
+  renderServerList(allServers);
 }
 
 function renderServerList(servers) {
@@ -1299,6 +1322,14 @@ const TABS = {
     ]
   }
 };
+
+// ── INIT ──
+checkAuth();
+
+// handle login redirect
+if (new URLSearchParams(window.location.search).get('login') === 'success') {
+  checkAuth().then(() => { history.replaceState({}, '', '/'); });
+}
 
 // ── KEYBOARD ──────────────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
