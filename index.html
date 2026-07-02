@@ -396,7 +396,7 @@ footer small{font-size:12px;color:var(--text-3)}
   </ul>
   <div class="nav-right" id="navRight">
     <a href="https://discord.com/oauth2/authorize?client_id=1484987314533957754" target="_blank" class="btn btn-outline btn-sm">Invite Bot</a>
-    <button class="btn btn-discord btn-sm" onclick="login()">
+    <button class="btn btn-discord btn-sm" data-action="login">
       <img src="data:image/png;base64,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" style="width:20px;height:20px;object-fit:contain;" alt="">
       Sign in
     </button>
@@ -472,7 +472,7 @@ footer small{font-size:12px;color:var(--text-3)}
     <h1>Your server, fully<br><span class="gold">under control.</span></h1>
     <p class="hero-desc">Everything your Discord server needs — moderation, economy, leveling, and automod — configured from a single dashboard designed for server owners.</p>
     <div class="hero-actions">
-      <button class="btn btn-discord btn-lg" onclick="login()" style="gap:12px;padding:14px 32px;">
+      <button class="btn btn-discord btn-lg" data-action="login" style="gap:12px;padding:14px 32px;">
         <img src="data:image/png;base64,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" style="width:22px;height:22px;object-fit:contain;" alt="">
         Sign in with Discord
       </button>
@@ -521,7 +521,7 @@ footer small{font-size:12px;color:var(--text-3)}
         <div class="showcase-point"><span class="showcase-point-dot"></span>Configure welcome, goodbye, and logging channels</div>
         <div class="showcase-point"><span class="showcase-point-dot"></span>Live bot stats — ping, uptime, memory, and servers</div>
       </div>
-      <button class="btn btn-discord" onclick="login()">
+      <button class="btn btn-discord" data-action="login">
         <img src="data:image/png;base64,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" style="width:20px;height:20px;object-fit:contain;" alt="">
         Open Dashboard
       </button>
@@ -579,7 +579,7 @@ footer small{font-size:12px;color:var(--text-3)}
     <div class="cmd-preview-card"><div class="cmd-preview-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><div class="cmd-preview-name">/userinfo</div><div class="cmd-preview-desc">View detailed info about any member</div></div></div>
   </div>
   <div style="text-align:center;margin-top:32px">
-    <button class="btn btn-outline" onclick="login();setTimeout(()=>switchTab&&switchTab('fun'),800)">Browse all 91 commands in the dashboard</button>
+    <button class="btn btn-outline" data-action="login">Browse all 91 commands in the dashboard</button>
   </div>
 </section>
 
@@ -594,7 +594,7 @@ footer small{font-size:12px;color:var(--text-3)}
       <p>Sign in with Discord, select a server you own, and get full access to the dashboard. Free, instant, no setup required.</p>
     </div>
     <div class="cta-actions">
-      <button class="btn btn-discord btn-lg" onclick="login()">
+      <button class="btn btn-discord btn-lg" data-action="login">
         <img src="data:image/png;base64,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" style="width:20px;height:20px;object-fit:contain;" alt="">
         Sign in with Discord
       </button>
@@ -625,7 +625,7 @@ footer small{font-size:12px;color:var(--text-3)}
   <div class="modal">
     <div class="modal-head">
       <div><h2>Select a server</h2><p>Only servers you own are shown</p></div>
-      <button class="modal-close" onclick="closeServerModal()">&#x2715;</button>
+      <button class="modal-close" data-action="close-modal">&#x2715;</button>
     </div>
     <div class="modal-search">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -634,7 +634,7 @@ footer small{font-size:12px;color:var(--text-3)}
     <div class="server-list" id="serverList"></div>
     <div class="modal-foot">
       <span class="modal-foot-note" id="selNote">No server selected</span>
-      <button class="btn btn-white btn-sm" id="openDashBtn" onclick="openDashboard()">Configure</button>
+      <button class="btn btn-white btn-sm" id="openDashBtn" data-action="open-dashboard">Configure</button>
     </div>
   </div>
 </div>
@@ -643,7 +643,7 @@ footer small{font-size:12px;color:var(--text-3)}
 <div class="dash" id="dash">
   <div class="dash-bar">
     <div class="dash-bar-left">
-      <button class="dash-back" onclick="closeDashboard()">
+      <button class="dash-back" data-action="close-dashboard">
         <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
       </button>
       <div class="dash-server">
@@ -703,8 +703,8 @@ function updateNav() {
       ? '<img src="https://cdn.discordapp.com/avatars/'+me.id+'/'+me.avatar+'.png?size=32" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" alt="">'
       : '<div style="width:24px;height:24px;border-radius:50%;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold)">'+me.username[0].toUpperCase()+'</div>';
     el.innerHTML = '<div style="display:flex;align-items:center;gap:8px">'+av+'<span style="font-size:13px;font-weight:600;color:var(--text-2)">'+me.username+'</span></div>'
-      +'<button class="btn btn-ghost btn-sm" onclick="handleLogout()">Sign out</button>'
-      +'<button class="btn btn-white btn-sm" onclick="openServerModal()">Dashboard</button>';
+      +'<button class="btn btn-ghost btn-sm" data-action="logout">Sign out</button>'
+      +'<button class="btn btn-white btn-sm" data-action="open-server-modal">Dashboard</button>';
   }
 }
 
@@ -713,7 +713,7 @@ function handleLogout() {
   me = null; myGuilds = [];
   const el = document.getElementById('navRight');
   if (el) el.innerHTML = '<a href="https://discord.com/oauth2/authorize?client_id=1484987314533957754" target="_blank" class="btn btn-outline btn-sm">Invite Bot</a>'
-      + '<button class="btn btn-discord btn-sm" onclick="login()">Sign in with Discord</button>';
+      + '<button class="btn btn-discord btn-sm" data-action="login">Sign in with Discord</button>';
 }
 
 function login() {
@@ -927,7 +927,7 @@ async function renderAutomod(main) {
             <div class="bw-area">
               <div class="bw-add-row">
                 <input type="text" id="bw-input" placeholder="Add a word or phrase..." maxlength="80" autocomplete="off">
-                <button class="btn btn-white btn-sm" onclick="addBW()">Add</button>
+                <button class="btn btn-white btn-sm" data-action="add-bw">Add</button>
               </div>
               <div class="bw-list" id="bw-list">
                 ${words.length ? words.map(w=>'<div class="bw-tag" id="bwt-'+safeKey(w)+'"><span class="mono">'+w+'</span><button onclick="removeBW(\"'+w+'\")">\u00d7</button></div>').join('') : '<span class="bw-empty">No blocked words yet. Add one above.</span>'}
@@ -1193,6 +1193,20 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (document.getElementById('dash').classList.contains('open')) closeDashboard();
   else closeServerModal();
+});
+
+// ── EVENT DELEGATION (fixes onclick timing issues) ────────────────────────────
+document.addEventListener('click', function(e) {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+  if (action === 'login')           login();
+  if (action === 'close-modal')     closeServerModal();
+  if (action === 'open-dashboard')  openDashboard();
+  if (action === 'close-dashboard') closeDashboard();
+  if (action === 'add-bw')          addBW();
+  if (action === 'open-server-modal') openServerModal();
+  if (action === 'logout')          handleLogout();
 });
 </script>
 </body>
