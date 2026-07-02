@@ -3,33 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>NexaBot — Professional Discord Bot</title>
+<title>NexaBot — Discord Bot Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#06060a;
-  --surface:#0d0d14;
-  --surface-2:#13131e;
-  --surface-3:#1a1a28;
-  --border:rgba(255,255,255,0.06);
-  --border-2:rgba(255,255,255,0.1);
-  --border-3:rgba(255,255,255,0.16);
-  --gold:#c8912a;
-  --gold-hi:#e8a93c;
-  --gold-dim:rgba(200,145,42,0.1);
-  --gold-glow:rgba(200,145,42,0.18);
-  --text:#f2f2f2;
-  --text-2:#888;
-  --text-3:#444;
-  --green:#2ecc71;
-  --green-dim:rgba(46,204,113,0.1);
-  --red:#e74c3c;
-  --red-dim:rgba(231,76,60,0.1);
+  --bg:#070709;
+  --surface:#0e0e13;
+  --surface-2:#141419;
+  --surface-3:#1c1c24;
+  --border:rgba(255,255,255,0.055);
+  --border-2:rgba(255,255,255,0.095);
+  --border-3:rgba(255,255,255,0.15);
+  --gold:#c4891f;
+  --gold-hi:#dfa032;
+  --gold-dim:rgba(196,137,31,0.1);
+  --gold-glow:rgba(196,137,31,0.18);
+  --text:#efefef;
+  --text-2:#808080;
+  --text-3:#3a3a3a;
+  --green:#27ae60;
+  --green-dim:rgba(39,174,96,0.1);
+  --red:#c0392b;
+  --red-dim:rgba(192,57,43,0.1);
   --blue:#5865f2;
   --blue-dim:rgba(88,101,242,0.12);
-  --r:8px;--r-lg:14px;--r-xl:20px;
+  --r:8px;--r-lg:12px;--r-xl:18px;
 }
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -37,16 +37,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mono{font-family:'JetBrains Mono',monospace}
 
 /* ─ NAV ─────────────────────────────────────────────────────────── */
-nav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(6,6,10,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
-.nav-brand-logo{width:30px;height:30px;border-radius:8px;overflow:hidden;flex-shrink:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(7,7,9,0.94);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.nav-brand{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
+.nav-brand-logo{width:28px;height:28px;border-radius:7px;overflow:hidden;flex-shrink:0;border:1px solid var(--border-2)}
 .nav-brand-logo img{width:100%;height:100%;object-fit:cover;display:block}
-.nav-brand-name{font-size:16px;font-weight:800;letter-spacing:-0.4px;color:#fff}
+.nav-brand-name{font-size:15.5px;font-weight:800;letter-spacing:-0.5px;color:#fff}
 .nav-brand-name span{color:var(--gold-hi)}
-.nav-center{display:flex;align-items:center;gap:32px;list-style:none}
-.nav-center a{color:var(--text-2);text-decoration:none;font-size:13.5px;font-weight:500;transition:color .18s;letter-spacing:-0.1px}
+.nav-center{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-center a{color:var(--text-2);text-decoration:none;font-size:13px;font-weight:500;transition:color .15s;letter-spacing:-0.1px}
 .nav-center a:hover{color:var(--text)}
-.nav-right{display:flex;align-items:center;gap:10px}
+.nav-divider{width:1px;height:16px;background:var(--border-2);flex-shrink:0}
+.nav-right{display:flex;align-items:center;gap:8px}
 
 /* ─ BUTTONS ──────────────────────────────────────────────────────── */
 .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .18s;white-space:nowrap;letter-spacing:-0.1px}
@@ -67,38 +68,39 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;display:flex;ali
 .btn-danger:hover{background:rgba(231,76,60,.2)}
 
 /* ─ HERO ─────────────────────────────────────────────────────────── */
-.hero{min-height:100vh;display:flex;align-items:center;padding:100px 52px 80px;position:relative;overflow:hidden}
+.hero{min-height:100vh;display:flex;align-items:center;padding:110px 52px 90px;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;pointer-events:none}
+.hero-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 70% 40%,rgba(196,137,31,0.04) 0%,transparent 65%);pointer-events:none}
 .hero-bg-img{position:absolute;right:-60px;top:0;bottom:0;width:55%;object-fit:cover;object-position:left center;opacity:0.07;filter:grayscale(30%)}
 .hero-bg-grad{position:absolute;inset:0;background:linear-gradient(105deg,var(--bg) 42%,transparent 75%)}
 .hero-content{position:relative;z-index:1;max-width:620px}
 .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:100px;font-size:11.5px;font-weight:600;color:var(--text-2);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:28px;font-family:'JetBrains Mono',monospace}
 .hero-eyebrow-dot{width:6px;height:6px;background:var(--green);border-radius:50%;flex-shrink:0}
-.hero h1{font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1.04;letter-spacing:-3px;color:#fff;margin-bottom:24px}
+.hero h1{font-size:clamp(42px,5.2vw,74px);font-weight:900;line-height:1.03;letter-spacing:-3.5px;color:#fff;margin-bottom:22px}
 .hero h1 .gold{color:var(--gold-hi)}
-.hero-desc{font-size:17px;color:var(--text-2);line-height:1.75;max-width:480px;margin-bottom:44px;font-weight:400}
+.hero-desc{font-size:16px;color:var(--text-2);line-height:1.8;max-width:460px;margin-bottom:40px;font-weight:400;letter-spacing:0.1px}
 .hero-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:64px}
 .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;max-width:560px}
-.hero-stat{background:var(--surface);padding:18px 20px}
-.hero-stat-num{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.8px;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.hero-stat{background:var(--surface);padding:16px 20px}
+.hero-stat-num{font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.5px;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
 .hero-stat-lbl{font-size:11px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:0.8px}
 
 /* ─ SECTIONS ─────────────────────────────────────────────────────── */
 .section{max-width:1200px;margin:0 auto;padding:96px 52px}
 .section-tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px}
-.section-title{font-size:clamp(28px,3vw,44px);font-weight:800;letter-spacing:-1.5px;color:#fff;line-height:1.08;margin-bottom:16px}
+.section-title{font-size:clamp(26px,2.8vw,40px);font-weight:800;letter-spacing:-1.2px;color:#fff;line-height:1.1;margin-bottom:14px}
 .section-sub{font-size:15px;color:var(--text-2);max-width:420px;line-height:1.7}
 .section-hd{margin-bottom:56px}
 .divider{height:1px;background:var(--border);max-width:1200px;margin:0 auto}
 
 /* ─ FEATURES GRID ────────────────────────────────────────────────── */
 .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
-.feat{background:var(--surface);padding:32px;transition:background .2s}
-.feat:hover{background:var(--surface-2)}
+.feat{background:var(--surface);padding:28px 30px;transition:background .2s}
+.feat{position:relative}.feat:hover{background:var(--surface-2)}.feat::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);opacity:0;transition:opacity .2s}.feat:hover::after{opacity:1}
 .feat-icon{width:44px;height:44px;background:var(--surface-3);border:1px solid var(--border-2);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;flex-shrink:0}
 .feat-icon svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.feat h3{font-size:15px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.2px}
-.feat p{font-size:13px;color:var(--text-2);line-height:1.7}
+.feat h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-0.2px}
+.feat p{font-size:13px;color:var(--text-2);line-height:1.65}
 .feat-tag{margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-3);padding:3px 8px;border:1px solid var(--border);border-radius:4px;display:inline-block}
 
 /* ─ SHOWCASE ─────────────────────────────────────────────────────── */
@@ -116,8 +118,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;display:flex;ali
 
 /* ─ COMMANDS PREVIEW ─────────────────────────────────────────────── */
 .cmd-preview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.cmd-preview-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:border-color .18s}
-.cmd-preview-card:hover{border-color:var(--border-2)}
+.cmd-preview-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px 15px;display:flex;align-items:flex-start;gap:11px;transition:border-color .18s,background .18s}
+.cmd-preview-card:hover{border-color:var(--border-2);background:var(--surface-3)}
 .cmd-preview-icon{width:32px;height:32px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cmd-preview-icon svg{width:14px;height:14px;stroke:var(--text-2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .cmd-preview-name{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:#fff;margin-bottom:3px}
@@ -125,13 +127,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;display:flex;ali
 
 /* ─ CTA ──────────────────────────────────────────────────────────── */
 .cta-section{padding:96px 52px}
-.cta-inner{max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-xl);padding:72px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:48px}
-.cta-inner h2{font-size:36px;font-weight:800;letter-spacing:-1.2px;color:#fff;margin-bottom:12px}
+.cta-inner{max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-xl);padding:64px 72px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:48px}
+.cta-inner h2{font-size:32px;font-weight:800;letter-spacing:-1px;color:#fff;margin-bottom:10px}
 .cta-inner p{font-size:15px;color:var(--text-2);line-height:1.65;max-width:480px}
 .cta-actions{display:flex;flex-direction:column;gap:10px;flex-shrink:0;align-items:flex-end}
 
 /* ─ FOOTER ───────────────────────────────────────────────────────── */
-footer{border-top:1px solid var(--border);padding:40px 52px}
+footer{border-top:1px solid var(--border);padding:32px 52px}
 .footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .footer-brand{display:flex;align-items:center;gap:8px}
 .footer-brand img{width:22px;height:22px;border-radius:5px;object-fit:cover}
@@ -208,18 +210,18 @@ footer small{font-size:12px;color:var(--text-3)}
 
 /* ─ MAIN PANEL ───────────────────────────────────────────────────── */
 .dash-main{flex:1;overflow-y:auto;background:var(--bg)}
-.panel-header{padding:26px 30px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.panel-header{padding:24px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
 .panel-title{font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.4px}
 .panel-sub{font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.5}
-.panel-body{padding:22px 30px 48px}
+.panel-body{padding:20px 28px 48px}
 
 /* ─ SETTINGS CARDS ───────────────────────────────────────────────── */
 .s-stack{display:flex;flex-direction:column;gap:10px}
 .s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
-.s-card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.s-card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
 .s-card-head h3{font-size:13.5px;font-weight:700;color:#fff;letter-spacing:-0.2px}
 .s-card-head p{font-size:11.5px;color:var(--text-2);margin-top:2px}
-.s-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 20px;border-bottom:1px solid var(--border);transition:background .12s}
+.s-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:13px 18px;border-bottom:1px solid var(--border);transition:background .12s}
 .s-row:last-child{border-bottom:none}
 .s-row:hover{background:rgba(255,255,255,.012)}
 .s-row-label strong{font-size:13px;font-weight:600;color:var(--text);display:block;letter-spacing:-0.1px}
@@ -467,8 +469,8 @@ footer small{font-size:12px;color:var(--text-3)}
     </div>
   </div>
   <div class="hero-content">
-    <h1>Built to run your<br><span class="gold">Discord server.</span></h1>
-    <p class="hero-desc">Moderation, economy, leveling, and automod — everything configured from one dashboard. No commands needed.</p>
+    <h1>Your server, fully<br><span class="gold">under control.</span></h1>
+    <p class="hero-desc">Everything your Discord server needs — moderation, economy, leveling, and automod — configured from a single dashboard designed for server owners.</p>
     <div class="hero-actions">
       <button class="btn btn-discord btn-lg" onclick="login()" style="gap:12px;padding:14px 32px;">
         <img src="data:image/png;base64,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" style="width:22px;height:22px;object-fit:contain;" alt="">
@@ -490,9 +492,9 @@ footer small{font-size:12px;color:var(--text-3)}
 <!-- FEATURES -->
 <section class="section" id="features">
   <div class="section-hd">
-    <div class="section-tag">What NexaBot does</div>
-    <h2 class="section-title">Every feature your community needs</h2>
-    <p class="section-sub">Six fully independent modules — enable only what your server needs, configure everything from the dashboard.</p>
+    <div class="section-tag">Features</div>
+    <h2 class="section-title">Everything your server needs</h2>
+    <p class="section-sub">Six independent modules. Enable only what matters, configure everything from your dashboard in real time.</p>
   </div>
   <div class="features-grid">
     <div class="feat"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h3>Moderation</h3><p>Bans, kicks, mutes, warns, purge, anti-raid, anti-nuke, panic mode, and full case history with logging.</p><div class="feat-tag">mod.*</div></div>
@@ -511,8 +513,8 @@ footer small{font-size:12px;color:var(--text-3)}
   <div class="showcase-inner">
     <div>
       <div class="section-tag">Dashboard</div>
-      <h2 class="section-title" style="font-size:28px">Configure everything in one place</h2>
-      <p style="font-size:14px;color:var(--text-2);line-height:1.75;margin-bottom:24px">Sign in with Discord, select your server, and manage automod, plugins, welcome messages, logging, and more in real time without touching a single command.</p>
+      <h2 class="section-title" style="font-size:26px;letter-spacing:-0.8px">One dashboard.<br>Full control.</h2>
+      <p style="font-size:14px;color:var(--text-2);line-height:1.75;margin-bottom:24px">Select your server and manage automod, plugins, welcome messages, and logging in real time. No commands, no guesswork.</p>
       <div class="showcase-points">
         <div class="showcase-point"><span class="showcase-point-dot"></span>Real-time automod and bad word list management</div>
         <div class="showcase-point"><span class="showcase-point-dot"></span>Enable and disable plugins per server instantly</div>
@@ -588,8 +590,8 @@ footer small{font-size:12px;color:var(--text-3)}
   <div class="cta-inner">
     <div>
       <div class="section-tag">Get started</div>
-      <h2>Ready to configure your server?</h2>
-      <p>Sign in with Discord and get access to the full NexaBot dashboard. Configure automod, plugins, logging, and more in real time.</p>
+      <h2>Start configuring your server.</h2>
+      <p>Sign in with Discord, select a server you own, and get full access to the dashboard. Free, instant, no setup required.</p>
     </div>
     <div class="cta-actions">
       <button class="btn btn-discord btn-lg" onclick="login()">
